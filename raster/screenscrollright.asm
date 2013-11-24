@@ -28,8 +28,7 @@
 			cli
 			rts				; back to BASIC
 
-scroll		jsr latch
-			ldx delay		; apply delay to slow scroller down
+scroll		ldx delay		; apply delay to slow scroller down
 			dex
 			bne continue
 
@@ -47,11 +46,6 @@ scroll		jsr latch
 continue	stx delay		; set delay
 			asl $d019		; acknowledge interrupt
 			jmp $ea81
-
-latch		ldx #02			; stable raster delay
-			dex
-			bne latch+2
-			rts
 
 offset		.byte 00
 delay		.byte 02
