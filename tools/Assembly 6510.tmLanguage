@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>fileTypes</key>
+        <array>
+                <string>asm</string>
+                <string>ASM</string>
+                <string>s</string>
+                <string>S</string>
+        </array>
+        <key>name</key>
+        <string>6510 Assembly</string>
+        <key>patterns</key>
+        <array>
+                <dict>
+                        <key>match</key>
+                        <string>;.*$</string>
+                        <key>name</key>
+                        <string>comment.line</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>#{0,1}\$[0-9a-f]+h?</string>
+                        <key>name</key>
+                        <string>constant.numeric</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>%[0-1]+</string>
+                        <key>name</key>
+                        <string>asm.numneric.binary</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>\.(equ|org|byte|word|ds|align|include)</string>
+                        <key>name</key>
+                        <string>asm.directive</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>\b(?i)(v)?(adc|and|asl|bcc|bcs|beq|bit|bmi|bne|bpl|brk|bvc|bvs|clc|cld|cli|clv|cmp|cpx|cpy|dec|dex|dey|eor|inc|inx|iny|jmp|jsr|lda|ldy|ldx|lsr|nop|ora|pha|php|pla|plp|rol|ror|rti|rts|sbc|sec|sed|sei|sta|stx|sty|tax|tay|tsx|txa|txs|tya)\b</string>
+                        <key>name</key>
+                        <string>asm.instruction</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>\b(?i)(v)?(alr|anc|arr|aso|axa|axs|dcm|hlt|ins|las|lax|lse|oal|rla|rra|sax|say|skb|skw|tas|xaa|xas)\b</string>
+                        <key>name</key>
+                        <string>asm.instruction.illegal</string>
+                </dict>                
+                <dict>
+                        <key>match</key>
+                        <string>^[a-zA-Z0-9]+[ \t]+</string>
+                        <key>name</key>
+                        <string>asm.label.new</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>(?![a-z]{3} )[a-zA-Z]+[0-9]*[\+,]*?</string>
+                        <key>name</key>
+                        <string>asm.label.reference</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>("|').*?("|')</string>
+                        <key>name</key>
+                        <string>string</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>#{0,1}[0-9]+</string>
+                        <key>name</key>
+                        <string>asm.numeric.plain</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>#[\&lt;\&gt;]{1,1}</string>
+                        <key>name</key>
+                        <string>asm.operator</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>(?!,) *[axy]{1}[^a-z]</string>
+                        <key>name</key>
+                        <string>asm.instruction</string>
+                </dict>
+        </array>
+        <key>scopeName</key>
+        <string>source.asm.6510</string>
+        <key>uuid</key>
+
+        <string>55b5896f-e96c-4b46-82ab-8a19dc1703c9</string>
+</dict>
+</plist>
