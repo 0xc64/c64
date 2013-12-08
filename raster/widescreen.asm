@@ -47,7 +47,7 @@ widetop	jsr latch
 		sta $d012
 
 		asl $d019		; acknowledge interrupt
-		jmp $ea31
+		jmp $ea81
 
 widebot	jsr latch
 		lda #06			; set border colour
@@ -62,7 +62,7 @@ widebot	jsr latch
 		sty $d012
 
 		asl $d019		; acknowledge interrupt
-		jmp $ea81
+		jmp $ea31
 
 latch	ldx #02			; stable raster delay
 		dex

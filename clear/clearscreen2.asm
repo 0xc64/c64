@@ -6,10 +6,10 @@
 ;		screen
 ;
 
-chrout	.equ $ffd2	; kernal addresss
-		
-		.org $c000	; begin (49512)
+chrout  .equ $ffd2      ; kernal addresss
 
-main	lda #$93	; clear screen char
-		jsr chrout
-		rts			; return to BASIC
+        .org $c000      ; begin (49512)
+
+main    lda #$93        ; clear screen char
+        jsr chrout
+        rts             ; return to BASIC
