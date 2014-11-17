@@ -51,15 +51,27 @@
                 </dict>                
                 <dict>
                         <key>match</key>
-                        <string>^[a-zA-Z0-9]+[ \t]+</string>
+                        <string>^[a-z0-9_]+[ \t]+</string>
                         <key>name</key>
                         <string>asm.label.new</string>
                 </dict>
                 <dict>
                         <key>match</key>
-                        <string>(?![a-z]{3} )[a-zA-Z]+[0-9]*[\+,]*?</string>
+                        <string>^[A-Z0-9_]+[ \t]+</string>
+                        <key>name</key>
+                        <string>asm.constant</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>(?![a-z]{3} )[a-z_]+[0-9]*[\+,]*?</string>
                         <key>name</key>
                         <string>asm.label.reference</string>
+                </dict>
+                <dict>
+                        <key>match</key>
+                        <string>(?![a-z]{3} )[A-Z_]+[0-9]*[\+,]*?</string>
+                        <key>name</key>
+                        <string>asm.constant</string>
                 </dict>
                 <dict>
                         <key>match</key>
