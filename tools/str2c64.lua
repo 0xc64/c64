@@ -20,7 +20,7 @@ local map = {
 	['J'] = 010,	['K'] = 011,	['L'] = 012,	['M'] = 013,	['N'] = 014,
 	['O'] = 015,	['P'] = 016,	['Q'] = 017,	['R'] = 018,	['S'] = 019,
 	['T'] = 020,	['U'] = 021,	['V'] = 022,	['W'] = 023,	['X'] = 024,
-	['Y'] = 025,	['Z'] = 026,	['['] = 027,	['NA'] = 028,	[']'] = 029,
+	['Y'] = 025,	['Z'] = 026,	['['] = 027,	['$'] = 028,	[']'] = 029,
 	--['^030^'] = 030,	['^031^'] = 31,
 	[' '] = 032,	['!'] = 033,	['"'] = 034,	['#'] = 035,	['$'] = 036,
 	['%'] = 037,	['&'] = 038,	["'"] = 039,	['('] = 040,	[')'] = 041,
@@ -32,6 +32,7 @@ local map = {
 }
 
 
+local inverseMode = false
 local quietMode = false
 local showHelp = false
 local bytesPerRow = 8
@@ -57,6 +58,10 @@ local function setQuietMode()
 	quietMode = true
 end
 
+local function setInverseMode()
+	inverseMode = true
+end
+
 local log = function(str)
 	if quietMode then
 		return
@@ -77,6 +82,8 @@ local optionsMap = {
 	['/m'] = setMessage,
 	['-q'] = setQuietMode,
 	['/q'] = setQuietMode,
+	['/i'] = setInverseMode,
+	['-i'] = setInverseMode,
 }
 
 -- parse arguments
@@ -93,10 +100,10 @@ for i = 1, #arg do
 end
 
 -- display tool info
-log('Str2C64 - String converter (v0.1)')
+log('str2c64 - string converter (v0.2)')
 log('Andrew Burch - www.0xc64.com')
 
-if not message then
+if not message and not showHelp then
 	print('[ERR] - No message specified')
 	os.exit();
 end
@@ -111,6 +118,7 @@ if showHelp then
 	log('    options:')
 	log('      -h : show help')
 	log('      -q : quiet mode')
+	log('      -i: inverse characters')
 	log('      -o : output filename')
 	log('           (default is screen)')
 	log('      -b[1-10000] : bytes per line')
@@ -141,8 +149,17 @@ for i = 1, #message do
     	output = sformat("%s.byte ", output)
    	end
 
+   	-- extract the code
+   	local characterCode = map[c]
+
+   	-- output in inverse mode?
+    if inverseMode then
+    	characterCode = characterCode + 128
+    end
+
    	-- append next byte value
-    output = sformat("%s%s%03d", output, sep, map[c])
+    output = sformat("%s%s%03d", output, sep, characterCode)
+
 
     -- apply byte count to current row for formatting
     rowByteCount = rowByteCount + 1
@@ -178,6 +195,6 @@ if outputFile then
 		print('[ERR] - Unable to open file: ' .. err)
 	end
 else
-	log('[NFO] - Converted string:')
+	log('[NFO] - Converted string')
 	print(output)	
 end
