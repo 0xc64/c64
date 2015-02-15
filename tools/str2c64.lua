@@ -36,6 +36,7 @@ local inverseMode = false
 local quietMode = false
 local showHelp = false
 local bytesPerRow = 8
+local offset = 0
 local message
 
 local function setHelp()
@@ -62,6 +63,10 @@ local function setInverseMode()
 	inverseMode = true
 end
 
+local function setOffset(o)
+    offset = o
+end
+
 local log = function(str)
 	if quietMode then
 		return
@@ -82,8 +87,10 @@ local optionsMap = {
 	['/m'] = setMessage,
 	['-q'] = setQuietMode,
 	['/q'] = setQuietMode,
-	['/i'] = setInverseMode,
-	['-i'] = setInverseMode,
+    ['/i'] = setInverseMode,
+    ['-i'] = setInverseMode,
+    ['/f'] = setOffset,
+    ['-f'] = setOffset,
 }
 
 -- parse arguments
@@ -100,7 +107,7 @@ for i = 1, #arg do
 end
 
 -- display tool info
-log('str2c64 - string converter (v0.2)')
+log('str2c64 - string converter (v0.3)')
 log('Andrew Burch - www.0xc64.com')
 
 if not message and not showHelp then
@@ -118,7 +125,8 @@ if showHelp then
 	log('    options:')
 	log('      -h : show help')
 	log('      -q : quiet mode')
-	log('      -i: inverse characters')
+    log('      -i : inverse characters')
+	log('      -f[1-?] : offset output char codes')
 	log('      -o : output filename')
 	log('           (default is screen)')
 	log('      -b[1-10000] : bytes per line')
@@ -156,6 +164,8 @@ for i = 1, #message do
     if inverseMode then
     	characterCode = characterCode + 128
     end
+
+    characterCode = characterCode + offset
 
    	-- append next byte value
     output = sformat("%s%s%03d", output, sep, characterCode)

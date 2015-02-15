@@ -1,8 +1,8 @@
--- Program: sprite rle compressed exporter
+-- Program: music rle compress exporter
 -- Author: Andrew Burch
 -- Site: www.0xc64.com
--- Notes: Command line tool to export sprite data from
---          SpritePad into rle compressed data ready
+-- Notes: Command line tool to export music data from
+--          a sid file into rle compressed data ready
 --          for an assembly file
 --
 --
@@ -14,6 +14,7 @@ local tobyte = string.byte
 local strfmt = string.format
 
 -- options & default values
+local headerSize = 124
 local showHelp = false
 local quietMode = false
 local includeOrigin = false
@@ -100,8 +101,8 @@ local parseCommandline = function()
 end
 
 
--- import sprite data
-local importSpriteData = function(data, dataLength, startOffset, getByteFn)
+-- import music data
+local importMusicData = function(data, dataLength, startOffset, getByteFn)
     local readIndex = startOffset
     local outputIndex = 1
     local output = {}
@@ -215,22 +216,6 @@ local applyRLECompression = function(data)
 end
 
 
-local stripUnusedFontCharacters = function(data)
-    local unusedChars = {
-        28, 30, 31, 35, 36, 37, 42, 59, 61, 62, 63
-    }
-
-    for _, v in pairs(unusedChars) do
-        local offset = v * 8
-
-        for i = 0, 7 do
-            data[offset + i] = 0
-        end
-    end
-
-    return data
-end
-
 
 -- conversion function
 local convertToASM = function(data, fmt)
@@ -272,13 +257,13 @@ end
 parseCommandline()
 
 -- display tool information
-log('sprite2asm - Sprite Data Exporter (v0.1)')
+log('music2asm - Music Data Exporter (v0.1)')
 log('Andrew Burch - www.0xc64.com')
 
 -- display help and exit
 if showHelp then
     log('  Usage:')
-    log('    lua sprite2asm -iInputFile -oOutputFile [options]')
+    log('    lua music2asm -iInputFile -oOutputFile [options]')
     log('')
     log('    -i : input file')
     log('    -o : output file')
@@ -332,30 +317,28 @@ if filesize == 0 then
     os.exit()
 end
 
-log('[NFO] - Filesize: ' .. filesize)
+log('[NFO] - Data size: ' .. filesize - headerSize)
 
 
 -- load origin
-local olow = substr(data, 1, 1)
-local ohigh = substr(data, 2, 2)
+local olow = substr(data, 125, 125)
+local ohigh = substr(data, 126, 126)
 local origin = strfmt('$%02x%02x', tobyte(ohigh), tobyte(olow))
 log('[NFO] - Origin detected: ' .. origin)
 
 
--- import sprite data
-local spriteData = importSpriteData(data, string.len(data), 3, function(data, i) 
+-- import music data
+local musicData = importMusicData(data, string.len(data), 127, function(data, i) 
                         return tobyte(substr(data, i, i))
                     end)
 
-spriteData.data = stripUnusedFontCharacters(spriteData.data)
+log('[NFO] - Bytes extracted: ' .. musicData.totalBytes)
 
-log('[NFO] - Bytes extracted: ' .. spriteData.totalBytes)
-
-local outputData = spriteData
+local outputData = musicData
 
 -- perform RLE compression on data if required
 if exportCompressed then
-    outputData = applyRLECompression(spriteData.data)
+    outputData = applyRLECompression(musicData.data)
 
     log('[NFO] - Bytes after RLE: ' .. outputData.totalBytes)
 end
