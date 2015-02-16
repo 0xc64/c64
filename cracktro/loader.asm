@@ -6,6 +6,7 @@
 ; Music: Trident (Short.sid)
 ; About: 3172 intro loader
 ; Site: http://www.0xc64.com
+; Compiler: win2c64 (http://www.aartbik.com)
 ;
 
                         ; constants
@@ -350,8 +351,8 @@ relocate_code           ldx #000                        ; relocate code ready to
                         sta C_INTRO_START + $a00, x
                         lda intro_code_start + $b00, x
                         sta C_INTRO_START + $b00, x
-                        lda intro_code_start + $b1d, x
-                        sta C_INTRO_START + $b1d, x
+                        lda intro_code_start + $b2d, x
+                        sta C_INTRO_START + $b2d, x
                         inx
                         bne relocate_code + 2
 

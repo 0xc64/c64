@@ -6,6 +6,7 @@
 ; Music: Trident (Short.sid)
 ; About: A small cracktro style intro for the c64
 ; Site: http://www.0xc64.com
+; Compiler: win2c64 (http://www.aartbik.com)
 ;
 
                         ; zero page registers
@@ -571,6 +572,8 @@ continue_fade_update    dex
                         lda #>setup_intro_mainpart
                         sta set_postmusic_high + 1
 
+                        jsr clear_scroller_col_ram      ; moved for page boundary reasons
+
 fade_update_complete    ldy #000
                         sty REG_RASTERLINE
                         lda #<fade_split
@@ -1075,10 +1078,9 @@ skip_transition         ldy #098
 
 render_scroller_top     inc REG_INTFLAG               ; acknowledge interrupt
 
-                        clc
                         lda REG_SCREENCTL_2           ; 38 column mode + scroll
                         and #240
-                        adc scroll_magnitude
+                        ora scroll_magnitude
                         sta REG_SCREENCTL_2
 
 scroll_top_first_colour lda C_SCROLLER_BAR_COLOURS    ; set first colour - bad line
@@ -1305,14 +1307,14 @@ shift_scroller_colours  lda $d9b8, y
                         bne load_special_scroll_col
 
                         ldx #241                        ; delay until next highlight
-                        jmp user_default_scroll_col
+                        jmp use_default_scroll_col
 
 load_special_scroll_col cpx #010                         ; grab next highlight colour
-                        bcs user_default_scroll_col
+                        bcs use_default_scroll_col
                         lda scroller_colour_cycle, x
-                        jmp user_default_scroll_col + 2
+                        jmp use_default_scroll_col + 2
 
-user_default_scroll_col lda #014                        ; default scroller colour                       
+use_default_scroll_col  lda #006                        ; default scroller colour                       
                         sta $d9b8                       ; insert next colour
                         sta $d9e0
 
@@ -1504,6 +1506,18 @@ colour_update_complete  ldy #029
                         jmp $ea81
 
 
+                        ; page boundaries... X( -------------------------------------------------------------------------------------------]
+                        ; -----------------------------------------------------------------------------------------------------------------]
+
+clear_scroller_col_ram  ldx #039
+                        lda #006                        ; set scroller colour ram
+                        sta C_COLOUR_RAM + $1b8, x
+                        sta C_COLOUR_RAM + $1e0, x
+                        dex
+                        bpl clear_scroller_col_ram + 4
+                        rts
+
+
                         ; data tables -----------------------------------------------------------------------------------------------------]
                         ; -----------------------------------------------------------------------------------------------------------------]
 
@@ -1555,9 +1569,10 @@ display_text_a          .byte 096, 096, 071, 082, 069, 069, 084, 083, 096, 084, 
 display_text_b          .byte 096, 096, 096, 073, 075, 065, 082, 073, 108, 096, 083, 079, 083, 108, 096, 067
                         .byte 065, 077, 069, 076, 079, 084, 108, 096, 067, 082, 069, 083, 084, 108, 096, 079
                         .byte 088, 089, 082, 079, 078, 096, 096, 096
-display_text_c          .byte 096, 096, 067, 069, 078, 083, 079, 082, 108, 096, 072, 079, 075, 065, 084, 085
+display_text_c          .byte 096, 096, 067, 069, 078, 083, 079, 082, 108, 096, 072, 079, 075, 079, 084, 085
                         .byte 096, 070, 079, 082, 067, 069, 108, 096, 077, 079, 078, 108, 096, 070, 065, 073
                         .byte 082, 076, 073, 071, 072, 084, 096, 096
+
 
                         ; animated raster bar variables
 
