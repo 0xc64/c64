@@ -18,6 +18,7 @@ local showHelp = false
 local quietMode = false
 local includeOrigin = false
 local exportCompressed = true
+local expectOrigin = true
 local bytesPerRow = 8
 local outputMode = 'h'
 local inputFile
@@ -52,6 +53,10 @@ local function setOutputMode(m)
     outputMode = m
 end
 
+local function setNoOrigin()
+    expectOrigin = false
+end
+
 local function setExportUncompressed()
     exportCompressed = false
 end
@@ -72,6 +77,8 @@ local optionsMap = {
     ['/b'] = setBytesPerRow,
     ['-m'] = setOutputMode,
     ['/m'] = setOutputMode,
+    ['-n'] = setNoOrigin,
+    ['/n'] = setNoOrigin,
     ['-e'] = setExportUncompressed,
     ['/e'] = setExportUncompressed,
 }
@@ -215,23 +222,6 @@ local applyRLECompression = function(data)
 end
 
 
-local stripUnusedFontCharacters = function(data)
-    local unusedChars = {
-        28, 30, 31, 35, 36, 37, 42, 59, 61, 62, 63
-    }
-
-    for _, v in pairs(unusedChars) do
-        local offset = v * 8
-
-        for i = 0, 7 do
-            data[offset + i] = 0
-        end
-    end
-
-    return data
-end
-
-
 -- conversion function
 local convertToASM = function(data, fmt)
     local rowByteCount = 0
@@ -288,6 +278,7 @@ if showHelp then
     log('      -q : quiet mode')
     log('      -r : output origin')
     log('      -e : export uncompressed')
+    log('      -n : no origin (in input)')
     log('      -m[h/d]  : output mode (hex/decimal)')
     log('                (default is h')
     log('      -b[1-10000] : bytes per line')
@@ -311,6 +302,7 @@ end
 -- output options specified for export
 log('')
 log('[NFO] - Bytes per row: ' .. bytesPerRow)
+log('[NFO] - Input has origin: ' .. (expectOrigin and 'Yes' or 'No'))
 log('[NFO] - Output origin: ' .. (includeOrigin and 'Yes' or 'No'))
 log('[NFO] - Output mode: ' .. (outputMode == 'h' and 'Hex' or 'Decimal'))
 log('[NFO] - RLE Compression: ' .. (exportCompressed and 'Yes' or 'No'))
@@ -336,18 +328,19 @@ log('[NFO] - Filesize: ' .. filesize)
 
 
 -- load origin
-local olow = substr(data, 1, 1)
-local ohigh = substr(data, 2, 2)
-local origin = strfmt('$%02x%02x', tobyte(ohigh), tobyte(olow))
-log('[NFO] - Origin detected: ' .. origin)
-
+if expectOrigin then
+    local olow = substr(data, 1, 1)
+    local ohigh = substr(data, 2, 2)
+    local origin = strfmt('$%02x%02x', tobyte(ohigh), tobyte(olow))    
+    log('[NFO] - Origin detected: ' .. origin)
+end
 
 -- import sprite data
-local spriteData = importSpriteData(data, string.len(data), 3, function(data, i) 
+local startOffset = expectOrigin and 3 or 1
+
+local spriteData = importSpriteData(data, string.len(data), startOffset, function(data, i) 
                         return tobyte(substr(data, i, i))
                     end)
-
-spriteData.data = stripUnusedFontCharacters(spriteData.data)
 
 log('[NFO] - Bytes extracted: ' .. spriteData.totalBytes)
 
@@ -361,7 +354,7 @@ if exportCompressed then
 end
 
 -- convert to output format
-local fmt = outputMode == 'h' and '$%02x' or '#%02d'
+local fmt = outputMode == 'h' and '$%02x' or '%03d'
 
 local convertedData = convertToASM(outputData.data, fmt)
 
