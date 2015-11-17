@@ -1,4 +1,4 @@
-; -- FLD (Flexable line distance) Example --
+; -- FLD (Flexible line distance) Example --
 ;
 ; Code: Jesder / 0xc64 / Hokuto Force
 ; Platform: C64
